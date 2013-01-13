@@ -5,9 +5,9 @@
 DOXYFILE_ENCODING = UTF-8
 
 PROJECT_NAME = libmpdclient
-PROJECT_NUMBER = @VERSION@
+PROJECT_NUMBER = @LIBMPDCLIENT_VERSION@
 
-OUTPUT_DIRECTORY = doc/api
+OUTPUT_DIRECTORY = @DOXYGEN_OUTPUT_DIRECTORY@
 
 FULL_PATH_NAMES = YES
 STRIP_FROM_PATH = include/
@@ -33,7 +33,7 @@ WARN_NO_PARAMDOC = NO
 # configuration options related to the input files
 #---------------------------------------------------------------------------
 
-INPUT = @abs_top_srcdir@/include/mpd
+INPUT = @CMAKE_SOURCE_DIR@/include/mpd
 FILE_PATTERNS = *.h
 
 #---------------------------------------------------------------------------

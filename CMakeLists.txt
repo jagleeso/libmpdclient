@@ -2,6 +2,13 @@
 cmake_minimum_required(VERSION 2.8)
 project(libmpdclient) 
 
+set(LIBMPDCLIENT_VERSION 2.7)
+set(LIBMPDCLIENT_SOVERSION_MAJOR 2)
+set(LIBMPDCLIENT_SOVERSION_MINOR 6)
+set(LIBMPDCLIENT_SOVERSION_PATCH 0)
+
+set(DOXYGEN_OUTPUT_DIRECTORY doc/api)
+
 set(mpdinclude_HEADERS
 	include/mpd/async.h
 	include/mpd/audio_format.h
@@ -118,6 +125,30 @@ if(LINKER_HAS_GNU_FLAGS)
 endif()
 # message("CMAKE_EXE_LINKER_FLAGS == ${CMAKE_EXE_LINKER_FLAGS}")
 
+# build options
+
+# http://www.bluequartz.net/projects/EIM_Segmentation/SoftwareDocumentation/html/usewithcmakeproject.html
+#-- Add an Option to toggle the generation of the API documentation
+# option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
+option(DISABLE_DOCUMENTATION "Disable API doc generation" OFF)
+if(NOT DISABLE_DOCUMENTATION)
+    FIND_PACKAGE(Doxygen)
+    if (NOT DOXYGEN_FOUND)
+        message(FATAL_ERROR 
+            "Doxygen is needed to build the documentation. Please install it correctly")
+    endif()
+    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/${DOXYGEN_OUTPUT_DIRECTORY})
+    #-- Configure the Template Doxyfile for our specific project
+    configure_file(doc/doxygen.conf.in 
+        ${PROJECT_BINARY_DIR}/doxygen.conf @ONLY IMMEDIATE)
+    #-- Add a custom target to run Doxygen when ever the project is built
+    add_custom_target (Docs ALL 
+        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doxygen.conf
+        SOURCES ${PROJECT_BINARY_DIR}/doxygen.conf)
+    # IF you do NOT want the documentation to be generated EVERY time you build the project
+    # then leave out the 'ALL' keyword from the above command.
+endif()
+
 # TODO: run configure_file on these
 # ./include/mpd/version.h.in
 # ./doc/doxygen.conf.in
@@ -131,3 +162,8 @@ configure_file(include/mpd/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/mpd/
 
 # clementine wants static
 add_library(mpdclient SHARED ${src_libmpdclient_la_SOURCES})
+
+set_target_properties(mpdclient PROPERTIES
+    VERSION ${LIBMPDCLIENT_VERSION}
+    SOVERSION ${LIBMPDCLIENT_SOVERSION_MAJOR}.${LIBMPDCLIENT_SOVERSION_MINOR}.${LIBMPDCLIENT_SOVERSION_PATCH}
+)
