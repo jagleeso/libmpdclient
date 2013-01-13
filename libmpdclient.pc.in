@@ -1,10 +1,12 @@
-prefix=@prefix@
-exec_prefix=@exec_prefix@
-libdir=@libdir@
-includedir=@includedir@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=@CMAKE_INSTALL_PREFIX@
+libdir=@LIB_INSTALL_DIR@
+includedir=@CMAKE_INSTALL_PREFIX@/include
+pkgdatadir=@CMAKE_INSTALL_PREFIX@/@RESOURCE_PREFIX@
+sysconfdir=@CMAKE_INSTALL_PREFIX@/@RESOURCE_PREFIX@
 
 Name: libmpdclient
 Description: Music Player Daemon client library
-Version: @VERSION@
+Version: @LIBMPDCLIENT_VERSION@
 Libs: -L${libdir} -lmpdclient
 Cflags: -I${includedir}

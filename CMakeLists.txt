@@ -149,6 +149,27 @@ if(NOT DISABLE_DOCUMENTATION)
     # then leave out the 'ALL' keyword from the above command.
 endif()
 
+# libmpdclient.pc stuff
+
+set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
+set(EXEC_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX} CACHE PATH "Installation prefix for executables and object code libraries" FORCE)
+set(BIN_INSTALL_DIR ${EXEC_INSTALL_PREFIX}/bin CACHE PATH "Installation prefix for user executables" FORCE)
+set(LIB_INSTALL_DIR ${EXEC_INSTALL_PREFIX}/lib${LIB_SUFFIX} CACHE PATH  "Installation prefix for object code libraries" FORCE)
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include CACHE PATH "Installation prefix for C header files" FORCE)
+
+if (APPLE)
+ADD_DEFINITIONS(-DMACOS -DSTBI_NO_DDS)
+set(RESOURCE_PREFIX "Resources")
+else (APPLE)
+if (WIN32)
+set (RESOURCE_PREFIX "Resources")
+ADD_DEFINITIONS(-DWIN32 -DSTBI_NO_DDS)
+else(WIN32)
+set (RESOURCE_PREFIX "share/libmpdclient")
+ADD_DEFINITIONS(-DLINUX -DSTBI_NO_DDS)
+endif(WIN32)
+endif(APPLE)
+
 # TODO: run configure_file on these
 # ./include/mpd/version.h.in
 # ./doc/doxygen.conf.in
@@ -157,8 +178,8 @@ endif()
 # TODO: figure out how to generate config.h
 # configure_file(config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
-configure_file(libmpdclient.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libmpdclient.pc.in)
-configure_file(include/mpd/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/mpd/version.h.in)
+configure_file(libmpdclient.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libmpdclient.pc @ONLY)
+configure_file(include/mpd/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/mpd/version.h)
 
 # clementine wants static
 add_library(mpdclient SHARED ${src_libmpdclient_la_SOURCES})
