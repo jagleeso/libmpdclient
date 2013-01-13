@@ -49,6 +49,7 @@ set(mpdinclude_HEADERS
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
+    ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 set(lib_LTLIBRARIES mpdclient)
@@ -149,6 +150,17 @@ if(NOT DISABLE_DOCUMENTATION)
     # then leave out the 'ALL' keyword from the above command.
 endif()
 
+option(ENABLE_TCP "Enable TCP support" ON)
+
+option(ENABLE_WERROR "Treat warnings as errors" OFF)
+if (ENABLE_WERROR)
+    set(WERROR_FLAGS "-Werror -pedantic-errors")
+    check_c_compiler_flag("${WERROR_FLAGS}" COMPILER_SUPPORTS_WERROR_AND_PEDANTIC_ERRORS)
+    if (COMPILER_SUPPORTS_WERROR_AND_PEDANTIC_ERRORS)
+        set(CMAKE_CFLAGS "${CMAKE_CFLAGS} ${WERROR_FLAGS}")
+    endif()
+endif()
+
 # libmpdclient.pc stuff
 
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
@@ -176,13 +188,13 @@ endif(APPLE)
 # ./libmpdclient.pc.in
 
 # TODO: figure out how to generate config.h
-# configure_file(config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+configure_file(config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 configure_file(libmpdclient.pc.in ${CMAKE_CURRENT_BINARY_DIR}/libmpdclient.pc @ONLY)
 configure_file(include/mpd/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/include/mpd/version.h)
 
-# clementine wants static
-add_library(mpdclient SHARED ${src_libmpdclient_la_SOURCES})
+# clementine wants static (can be specified with BUILD_SHARED_LIBS)
+add_library(mpdclient ${src_libmpdclient_la_SOURCES})
 
 set_target_properties(mpdclient PROPERTIES
     VERSION ${LIBMPDCLIENT_VERSION}

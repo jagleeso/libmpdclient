@@ -1,6 +1,9 @@
 *.cache
 aclocal.m4
-config.*
+# for cmake, we need config.h.in:
+config.h
+# for autotools, config.h and config.h.in are all generated
+# config.*
 configure
 build
 *.la
