@@ -131,22 +131,23 @@ endif()
 # http://www.bluequartz.net/projects/EIM_Segmentation/SoftwareDocumentation/html/usewithcmakeproject.html
 #-- Add an Option to toggle the generation of the API documentation
 # option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentation" OFF)
-option(DISABLE_DOCUMENTATION "Disable API doc generation" OFF)
-if(NOT DISABLE_DOCUMENTATION)
+option(ENABLE_DOCUMENTATION "Enable API doc generation" ON)
+if(ENABLE_DOCUMENTATION)
     FIND_PACKAGE(Doxygen)
     if (NOT DOXYGEN_FOUND)
-        message(FATAL_ERROR "Doxygen is needed to build the documentation. Please install it correctly")
+        message(WARNING "Doxygen is needed to build the documentation. Please install it correctly")
+    else()
+        file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/${DOXYGEN_OUTPUT_DIRECTORY})
+        #-- Configure the Template Doxyfile for our specific project
+        configure_file(doc/doxygen.conf.in 
+            ${PROJECT_BINARY_DIR}/doxygen.conf @ONLY IMMEDIATE)
+        #-- Add a custom target to run Doxygen when ever the project is built
+        add_custom_target (Docs ALL 
+            COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doxygen.conf
+            SOURCES ${PROJECT_BINARY_DIR}/doxygen.conf)
+        # IF you do NOT want the documentation to be generated EVERY time you build the project
+        # then leave out the 'ALL' keyword from the above command.
     endif()
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/${DOXYGEN_OUTPUT_DIRECTORY})
-    #-- Configure the Template Doxyfile for our specific project
-    configure_file(doc/doxygen.conf.in 
-        ${PROJECT_BINARY_DIR}/doxygen.conf @ONLY IMMEDIATE)
-    #-- Add a custom target to run Doxygen when ever the project is built
-    add_custom_target (Docs ALL 
-        COMMAND ${DOXYGEN_EXECUTABLE} ${PROJECT_BINARY_DIR}/doxygen.conf
-        SOURCES ${PROJECT_BINARY_DIR}/doxygen.conf)
-    # IF you do NOT want the documentation to be generated EVERY time you build the project
-    # then leave out the 'ALL' keyword from the above command.
 endif()
 
 option(ENABLE_TCP "Enable TCP support" ON)
@@ -168,6 +169,26 @@ if (ENABLE_STD99)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${STD99_FLAGS}")
     endif()
 endif()
+
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNDEBUG")
+endif()
+
+# CFLAGS
+
+# TODO: check exact behaviour of AX_CHECK_COMPILER_FLAGS
+foreach(flag -Wall -W -Wextra -Wno-deprecated-declarations 
+        -Wmissing-prototypes -Wshadow -Wpointer-arith -Wstrict-prototypes 
+        -Wcast-qual -Wwrite-strings)
+    set(FLAG_TEST_VAR "${flag}")
+    string(TOUPPER "${FLAG_TEST_VAR}" FLAG_TEST_VAR)
+    string(REPLACE "-" "_" FLAG_TEST_VAR "${FLAG_TEST_VAR}")
+    set(FLAG_TEST_VAR "COMPILER_SUPPORTS${FLAG_TEST_VAR}")
+    check_c_compiler_flag("${flag}" ${FLAG_TEST_VAR})
+    if (${FLAG_TEST_VAR})
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${flag}")
+    endif()
+endforeach()
 
 # libmpdclient.pc stuff
 
