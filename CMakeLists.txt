@@ -190,6 +190,20 @@ foreach(flag -Wall -W -Wextra -Wno-deprecated-declarations
     endif()
 endforeach()
 
+# Compile-time options
+
+# no UNIX domain sockets on WIN32
+if (UNIX)
+    set(DEFAULT_SOCKET "/var/run/mpd/socket" CACHE PATH "Default path of the socket file" FORCE)
+endif()
+
+set(DEFAULT_HOST "localhost" CACHE STRING "Default MPD host")
+set(DEFAULT_PORT 6600 CACHE STRING "Default MPD port")
+string(REGEX MATCH "[0-9]+" IS_INTEGER "${DEFAULT_PORT}")
+if (NOT IS_INTEGER)
+    message(FATAL "DEFAULT_PORT must be an integer")
+endif()
+
 # libmpdclient.pc stuff
 
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")

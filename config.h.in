@@ -1,16 +1,16 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Default MPD host */
-#cmakedefine DEFAULT_HOST
+#cmakedefine DEFAULT_HOST "@DEFAULT_HOST@"
 
 /* Default MPD port */
-#cmakedefine DEFAULT_PORT
+#cmakedefine DEFAULT_PORT @DEFAULT_PORT@
 
 /* Default UNIX socket path */
-#cmakedefine DEFAULT_SOCKET
+#cmakedefine DEFAULT_SOCKET "@DEFAULT_SOCKET@"
 
 /* Define to enable TCP support */
-#cmakedefine ENABLE_TCP
+#cmakedefine01 ENABLE_TCP
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #cmakedefine HAVE_DLFCN_H
@@ -71,4 +71,4 @@
 #cmakedefine STDC_HEADERS
 
 /* Version number of package */
-#cmakedefine VERSION
+#cmakedefine LIBMPDCLIENT_VERSION "@LIBMPDCLIENT_VERSION@"
